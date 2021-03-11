@@ -2,11 +2,27 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+  <title>RSS aggregator</title>
 </head>
-<body>
-  
+<body class="d-flex flex-column min-vh-100">
+  <main class="flex-grow-1">
+    <section class="container-fluid p-5 bg-dark">
+      <div class="row">
+        <div class="col-md-10 col-lg-8 mx-auto text-white">
+         <form action="">
+            <div class="form-row">
+              <div class="col">
+                <input type="text" name="url" aria-label="url" class="form-control form-control-lg w-100" placeholder="ссылка RSS">
+              </div>
+              <div class="col-auto">
+                <button type="submit" aria-label="add" class="btn btn-lg btn-primary px-sm-5">Add</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
 </body>
 </html>
