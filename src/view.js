@@ -2,38 +2,48 @@
 
 import onChange from 'on-change';
 
-const renderForm = () => {};
+const renderForm = (state, elements) => {
+  const { valid: formIsValid, error: errorMessage } = state.form;
+  const { input, feedback } = elements;
 
-const renderFormError = (form, elements) => {
-  elements.feedback.innerHTML = '';
-
-  const field = form.fields.input;
-
-  if (field.valid) {
-    elements.input.classList.remove('is-invalid');
+  if (formIsValid) {
+    input.classList.remove('is-invalid');
   } else {
-    elements.input.classList.add('is-invalid');
-    elements.feedback.classList.add('text-danger');
-    elements.feedback.textContent = form.fields.input.error;
+    input.classList.add('is-invalid');
+    feedback.classList.add('text-danger');
+    feedback.textContent = errorMessage;
   }
 };
 
-const renderAppError = () => {};
+const renderLoadingProcess = (state, elements) => {
+  const { status: loadingStatus, error: errorMessage } = state.loadingProcess;
+  const { input, submit, feedback } = elements;
 
-export default (state, elements) => {
-  elements.input.focus();
-
-  const mapping = {
-    'form.status': () => renderForm(state.form, elements),
-    'form.fields.input': () => renderFormError(state.form, elements),
-    error: () => renderAppError(state.error, elements),
-  };
-
-  const watchedState = onChange(state, (path) => {
-    if (mapping[path]) {
-      mapping[path]();
-    }
-  });
-
-  return watchedState;
+  switch (loadingStatus) {
+    case 'failed':
+      break;
+    case 'idle':
+      break;
+    case 'loading':
+      break;
+    default:
+      throw Error(`Unknown loadingStatus: ${loadingStatus}`);
+  }
 };
+
+export default (state, elements) => onChange(state, (path) => {
+  switch (path) {
+    case 'form':
+      renderForm(state, elements);
+      break;
+    case 'loadingProcess':
+      renderLoadingProcess(state, elements);
+      break;
+    case 'feeds':
+      break;
+    case 'posts':
+      break;
+    default:
+      throw Error(`Unknown state: ${path}`);
+  }
+});
