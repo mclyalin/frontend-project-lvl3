@@ -58,10 +58,10 @@ export default () => {
   const elements = {
     form: document.querySelector('.rss-form'),
     input: document.querySelector('.rss-form input'),
-    button: document.querySelector('.rss-form button[type="submit"]'),
+    submit: document.querySelector('.rss-form button[type="submit"]'),
     feedback: document.querySelector('.feedback'),
-    feeds: document.querySelector('.feeds'),
-    posts: document.querySelector('.posts'),
+    feedsBox: document.querySelector('.feeds'),
+    postsBox: document.querySelector('.posts'),
   };
 
   const watchedState = initView(state, elements);
