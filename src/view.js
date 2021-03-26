@@ -44,11 +44,37 @@ const renderLoadingProcess = (loadingProcess, elements) => {
   }
 };
 
+const renderFeeds = (feeds, feedsBox) => {
+  const container = document.createDocumentFragment();
+
+  const h2 = document.createElement('h2');
+  h2.textContent = 'feeds';
+
+  const ul = document.createElement('ul');
+  ul.classList.add('list-group', 'mb-5');
+  const items = feeds.map((feed) => {
+    const li = document.createElement('li');
+    li.classList.add('list-group-item');
+    const h3 = document.createElement('h3');
+    h3.textContent = feed.title;
+    const p = document.createElement('p');
+    p.textContent = feed.description;
+    li.append(h3, p);
+    return li;
+  });
+  ul.append(...items);
+
+  container.append(h2, ul);
+
+  feedsBox.innerHTML = '';
+  feedsBox.append(container);
+};
+
 export default (state, elements) => {
   const mapping = {
     form: () => renderForm(state.form, elements),
     loadingProcess: () => renderLoadingProcess(state.loadingProcess, elements),
-    feeds: () => {},
+    feeds: () => renderFeeds(state.feeds, elements.feedsBox),
     posts: () => {},
   };
 
