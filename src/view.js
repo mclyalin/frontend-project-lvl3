@@ -2,29 +2,27 @@
 
 import onChange from 'on-change';
 
-const renderForm = (state, elements) => {
-  const { valid: formIsValid, error: errorMessage } = state.form;
+const renderForm = (form, elements) => {
   const { input, feedback } = elements;
 
-  if (formIsValid) {
+  if (form.valid) {
     input.classList.remove('is-invalid');
   } else {
     input.classList.add('is-invalid');
     feedback.classList.add('text-danger');
-    feedback.textContent = errorMessage;
+    feedback.textContent = form.error;
   }
 };
 
-const renderLoadingProcess = (state, elements) => {
-  const { status: loadingStatus, error: errorMessage } = state.loadingProcess;
+const renderLoadingProcess = (loadingProcess, elements) => {
   const { input, submit, feedback } = elements;
 
-  switch (loadingStatus) {
+  switch (loadingProcess.status) {
     case 'failed':
       submit.disabled = false;
       input.removeAttribute('readonly');
       feedback.classList.add('text-danger');
-      feedback.textContent = errorMessage;
+      feedback.textContent = loadingProcess.error;
       break;
     case 'idle':
       submit.disabled = false;
@@ -42,23 +40,23 @@ const renderLoadingProcess = (state, elements) => {
       feedback.innerHTML = '';
       break;
     default:
-      throw Error(`Unknown loadingStatus: ${loadingStatus}`);
+      throw Error(`Unknown loadingProcess status: ${loadingProcess.status}`);
   }
 };
 
-export default (state, elements) => onChange(state, (path) => {
-  switch (path) {
-    case 'form':
-      renderForm(state, elements);
-      break;
-    case 'loadingProcess':
-      renderLoadingProcess(state, elements);
-      break;
-    case 'feeds':
-      break;
-    case 'posts':
-      break;
-    default:
-      throw Error(`Unknown state: ${path}`);
-  }
-});
+export default (state, elements) => {
+  const mapping = {
+    form: () => renderForm(state.form, elements),
+    loadingProcess: () => renderLoadingProcess(state.loadingProcess, elements),
+    feeds: () => {},
+    posts: () => {},
+  };
+
+  const watchedState = onChange(state, (path) => {
+    if (mapping[path]) {
+      mapping[path]();
+    }
+  });
+
+  return watchedState;
+};
