@@ -8,7 +8,6 @@ const parse = (str) => {
   if (doc.querySelector('parsererror')) {
     return null;
   }
-
   const title = doc.querySelector('title').textContent;
   const description = doc.querySelector('description').textContent;
   const link = doc.querySelector('link').textContent;
@@ -103,6 +102,7 @@ export default () => {
             status: 'failed',
             error: 'noRss',
           };
+          return;
         }
         const feed = {
           id: _.uniqueId(),
@@ -130,8 +130,8 @@ export default () => {
         ];
 
         watchedState.loadingProcess = {
+          status: 'idle',
           error: null,
-          state: 'idle',
         };
       })
       .catch((err) => {
