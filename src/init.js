@@ -10,7 +10,6 @@ const parse = (str) => {
   }
   const title = doc.querySelector('title').textContent;
   const description = doc.querySelector('description').textContent;
-  const link = doc.querySelector('link').textContent;
   const elements = doc.querySelectorAll('item');
   const items = Array.from(elements).map((element) => ({
     title: element.querySelector('title').textContent,
@@ -20,17 +19,16 @@ const parse = (str) => {
   return {
     title,
     description,
-    link,
     items,
   };
 };
 
-const validate = (value, links = []) => {
+const validate = (value, list = []) => {
   const schema = yup
     .string()
     .required()
     .url()
-    .notOneOf(links);
+    .notOneOf(list);
 
   try {
     schema.validateSync(value);
@@ -69,9 +67,10 @@ export default () => {
     e.preventDefault();
 
     const formData = new FormData(e.target);
-    const value = formData.get('url').trim();
+    const targetUrl = formData.get('url').trim();
+    const existingUrls = state.feeds.map(({ url }) => url);
 
-    const validationError = validate(value);
+    const validationError = validate(targetUrl, existingUrls);
     if (validationError) {
       watchedState.form = {
         error: validationError,
@@ -86,7 +85,7 @@ export default () => {
     };
 
     const url = new URL('/get', 'https://hexlet-allorigins.herokuapp.com');
-    url.searchParams.set('url', value);
+    url.searchParams.set('url', targetUrl);
     const promise = axios.get(url.toString());
 
     watchedState.loadingProcess = {
@@ -106,7 +105,7 @@ export default () => {
         }
         const feed = {
           id: _.uniqueId(),
-          url: data.link,
+          url: targetUrl,
           title: data.title,
           description: data.description,
         };
@@ -114,9 +113,9 @@ export default () => {
         const posts = data.items.map((item) => ({
           id: _.uniqueId(),
           channelId: feed.id,
-          url: item.link,
           title: item.title,
           description: item.description,
+          link: item.link,
         }));
 
         watchedState.feeds = [
