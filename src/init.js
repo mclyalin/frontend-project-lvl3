@@ -85,7 +85,9 @@ export default () => {
     };
 
     const url = new URL('/get', 'https://hexlet-allorigins.herokuapp.com');
+    url.searchParams.set('disableCache', true);
     url.searchParams.set('url', targetUrl);
+    console.log(url.toString());
     const promise = axios.get(url.toString());
 
     watchedState.loadingProcess = {
