@@ -21,10 +21,25 @@ const renderLoadingProcess = (state, elements) => {
 
   switch (loadingStatus) {
     case 'failed':
+      submit.disabled = false;
+      input.removeAttribute('readonly');
+      feedback.classList.add('text-danger');
+      feedback.textContent = errorMessage;
       break;
     case 'idle':
+      submit.disabled = false;
+      input.removeAttribute('readonly');
+      input.value = '';
+      feedback.classList.add('text-success');
+      feedback.textContent = 'loading.success';
+      input.focus();
       break;
     case 'loading':
+      submit.disabled = true;
+      input.setAttribute('readonly', true);
+      feedback.classList.remove('text-success');
+      feedback.classList.remove('text-danger');
+      feedback.innerHTML = '';
       break;
     default:
       throw Error(`Unknown loadingStatus: ${loadingStatus}`);
