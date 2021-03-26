@@ -70,12 +70,42 @@ const renderFeeds = (feeds, feedsBox) => {
   feedsBox.append(container);
 };
 
+const renderPosts = (posts, elements) => {
+  const { postsBox } = elements;
+  const container = document.createDocumentFragment();
+
+  const h2 = document.createElement('h2');
+  h2.textContent = 'posts';
+
+  const ul = document.createElement('ul');
+  ul.classList.add('list-group');
+  const items = posts.map((post) => {
+    const li = document.createElement('li');
+    li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
+    const a = document.createElement('a');
+    a.setAttribute('href', post.link);
+    a.classList.add('font-weight-bold');
+    a.dataset.id = post.id;
+    a.textContent = post.title;
+    a.setAttribute('target', '_blank');
+    a.setAttribute('rel', 'noopener noreferrer');
+    li.append(a);
+    return li;
+  });
+  ul.append(...items);
+
+  container.append(h2, ul);
+
+  postsBox.innerHTML = '';
+  postsBox.append(container);
+};
+
 export default (state, elements) => {
   const mapping = {
     form: () => renderForm(state.form, elements),
     loadingProcess: () => renderLoadingProcess(state.loadingProcess, elements),
     feeds: () => renderFeeds(state.feeds, elements.feedsBox),
-    posts: () => {},
+    posts: () => renderPosts(state.posts, elements),
   };
 
   const watchedState = onChange(state, (path) => {
