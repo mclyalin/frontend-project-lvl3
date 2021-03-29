@@ -2,110 +2,105 @@
 
 import onChange from 'on-change';
 
-const renderForm = (form, elements) => {
-  const { input, feedback } = elements;
-
-  if (form.valid) {
-    input.classList.remove('is-invalid');
-  } else {
-    input.classList.add('is-invalid');
-    feedback.classList.add('text-danger');
-    feedback.textContent = form.error;
-  }
-};
-
-const renderLoadingProcess = (loadingProcess, elements) => {
-  const { input, submit, feedback } = elements;
-
-  switch (loadingProcess.status) {
-    case 'failed':
-      submit.disabled = false;
-      input.removeAttribute('readonly');
+export default (state, elements, i18n) => {
+  const renderForm = (form, { input, feedback }) => {
+    if (form.valid) {
+      input.classList.remove('is-invalid');
+    } else {
+      input.classList.add('is-invalid');
       feedback.classList.add('text-danger');
-      feedback.textContent = loadingProcess.error;
-      break;
-    case 'idle':
-      submit.disabled = false;
-      input.removeAttribute('readonly');
-      input.value = '';
-      feedback.classList.add('text-success');
-      feedback.textContent = 'loading.success';
-      input.focus();
-      break;
-    case 'loading':
-      submit.disabled = true;
-      input.setAttribute('readonly', true);
-      feedback.classList.remove('text-success');
-      feedback.classList.remove('text-danger');
-      feedback.innerHTML = '';
-      break;
-    default:
-      throw Error(`Unknown loadingProcess status: ${loadingProcess.status}`);
-  }
-};
+      feedback.textContent = i18n.t([`errors.${form.error}`, 'errors.unknown']);
+    }
+  };
 
-const renderFeeds = (feeds, feedsBox) => {
-  const container = document.createDocumentFragment();
+  const renderLoadingProcess = (loadingProcess, { input, submit, feedback }) => {
+    switch (loadingProcess.status) {
+      case 'failed':
+        submit.disabled = false;
+        input.removeAttribute('readonly');
+        feedback.classList.add('text-danger');
+        feedback.textContent = i18n.t([`errors.${loadingProcess.error}`, 'errors.unknown']);
+        break;
+      case 'idle':
+        submit.disabled = false;
+        input.removeAttribute('readonly');
+        input.value = '';
+        feedback.classList.add('text-success');
+        feedback.textContent = i18n.t('loading.success');
+        input.focus();
+        break;
+      case 'loading':
+        submit.disabled = true;
+        input.setAttribute('readonly', true);
+        feedback.classList.remove('text-success');
+        feedback.classList.remove('text-danger');
+        feedback.innerHTML = '';
+        break;
+      default:
+        throw Error(`Unknown loadingProcess status: ${loadingProcess.status}`);
+    }
+  };
 
-  const h2 = document.createElement('h2');
-  h2.textContent = 'feeds';
+  const renderFeeds = (feeds, feedsBox) => {
+    const container = document.createDocumentFragment();
 
-  const ul = document.createElement('ul');
-  ul.classList.add('list-group', 'mb-5');
-  const items = feeds.map((feed) => {
-    const li = document.createElement('li');
-    li.classList.add('list-group-item');
-    const h3 = document.createElement('h3');
-    h3.textContent = feed.title;
-    const p = document.createElement('p');
-    p.textContent = feed.description;
-    li.append(h3, p);
-    return li;
-  });
-  ul.append(...items);
+    const h2 = document.createElement('h2');
+    h2.textContent = i18n.t('ui.feeds');
 
-  container.append(h2, ul);
+    const ul = document.createElement('ul');
+    ul.classList.add('list-group', 'mb-5');
+    const items = feeds.map((feed) => {
+      const li = document.createElement('li');
+      li.classList.add('list-group-item');
+      const h3 = document.createElement('h3');
+      h3.textContent = feed.title;
+      const p = document.createElement('p');
+      p.textContent = feed.description;
+      li.append(h3, p);
+      return li;
+    });
+    ul.append(...items);
 
-  feedsBox.innerHTML = '';
-  feedsBox.append(container);
-};
+    container.append(h2, ul);
 
-const renderPosts = (posts, elements) => {
-  const { postsBox } = elements;
-  const container = document.createDocumentFragment();
+    feedsBox.innerHTML = '';
+    feedsBox.append(container);
+  };
 
-  const h2 = document.createElement('h2');
-  h2.textContent = 'posts';
+  const renderPosts = (posts, postsBox) => {
+    const container = document.createDocumentFragment();
 
-  const ul = document.createElement('ul');
-  ul.classList.add('list-group');
-  const items = posts.map((post) => {
-    const li = document.createElement('li');
-    li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
-    const a = document.createElement('a');
-    a.setAttribute('href', post.link);
-    a.classList.add('font-weight-bold');
-    a.dataset.id = post.id;
-    a.textContent = post.title;
-    a.setAttribute('target', '_blank');
-    a.setAttribute('rel', 'noopener noreferrer');
-    li.append(a);
-    return li;
-  });
-  ul.append(...items);
+    const h2 = document.createElement('h2');
+    h2.textContent = i18n.t('ui.posts');
 
-  container.append(h2, ul);
+    const ul = document.createElement('ul');
+    ul.classList.add('list-group');
+    const items = posts.map((post) => {
+      const li = document.createElement('li');
+      li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
+      const a = document.createElement('a');
+      a.setAttribute('href', post.link);
+      a.classList.add('font-weight-bold');
+      a.dataset.id = post.id;
+      a.textContent = post.title;
+      a.setAttribute('target', '_blank');
+      a.setAttribute('rel', 'noopener noreferrer');
+      li.append(a);
+      return li;
+    });
+    ul.append(...items);
 
-  postsBox.innerHTML = '';
-  postsBox.append(container);
-};
+    container.append(h2, ul);
 
-export default (state, elements) => {
+    postsBox.innerHTML = '';
+    postsBox.append(container);
+  };
+
   const mapping = {
     form: () => renderForm(state.form, elements),
     loadingProcess: () => renderLoadingProcess(state.loadingProcess, elements),
     feeds: () => renderFeeds(state.feeds, elements.feedsBox),
-    posts: () => renderPosts(state.posts, elements),
+    posts: () => renderPosts(state.posts, elements.postsBox),
   };
 
   const watchedState = onChange(state, (path) => {

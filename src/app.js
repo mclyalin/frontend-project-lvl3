@@ -1,7 +1,8 @@
+/* eslint-disable no-param-reassign, no-console  */
+
 import axios from 'axios';
 import * as yup from 'yup';
 import _ from 'lodash';
-import initView from './view.js';
 
 const parse = (str) => {
   const doc = (new DOMParser()).parseFromString(str, 'text/xml');
@@ -24,6 +25,16 @@ const parse = (str) => {
 };
 
 const validate = (value, list = []) => {
+  yup.setLocale({
+    string: {
+      url: 'notUrl',
+    },
+    mixed: {
+      required: 'required',
+      notOneOf: 'exists',
+    },
+  });
+
   const schema = yup
     .string()
     .required()
@@ -34,41 +45,17 @@ const validate = (value, list = []) => {
     schema.validateSync(value);
     return null;
   } catch (err) {
-    return err.type;
+    return err.message;
   }
 };
 
-export default () => {
-  const state = {
-    feeds: [],
-    posts: [],
-    loadingProcess: {
-      status: 'idle',
-      error: null,
-    },
-    form: {
-      error: null,
-      valid: true,
-    },
-  };
-
-  const elements = {
-    form: document.querySelector('.rss-form'),
-    input: document.querySelector('.rss-form input'),
-    submit: document.querySelector('.rss-form button[type="submit"]'),
-    feedback: document.querySelector('.feedback'),
-    feedsBox: document.querySelector('.feeds'),
-    postsBox: document.querySelector('.posts'),
-  };
-
-  const watchedState = initView(state, elements);
-
+export default (watchedState, elements) => {
   elements.form.addEventListener('submit', (e) => {
     e.preventDefault();
 
     const formData = new FormData(e.target);
     const targetUrl = formData.get('url').trim();
-    const existingUrls = state.feeds.map(({ url }) => url);
+    const existingUrls = watchedState.feeds.map(({ url }) => url);
 
     const validationError = validate(targetUrl, existingUrls);
     if (validationError) {
@@ -87,7 +74,6 @@ export default () => {
     const url = new URL('/get', 'https://hexlet-allorigins.herokuapp.com');
     url.searchParams.set('disableCache', true);
     url.searchParams.set('url', targetUrl);
-    console.log(url.toString());
     const promise = axios.get(url.toString());
 
     watchedState.loadingProcess = {
