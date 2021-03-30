@@ -5,7 +5,7 @@ import resources from './locales';
 import initView from './view.js';
 import app from './app.js';
 
-const defaultLanguage = 'en';
+const defaultLanguage = 'ru';
 
 export default () => {
   i18n.init({
