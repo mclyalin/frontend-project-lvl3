@@ -22,6 +22,9 @@ export default () => {
         error: null,
         valid: true,
       },
+      modal: {
+        postId: null,
+      },
       ui: {
         seenPosts: new Set(),
       },
@@ -34,6 +37,7 @@ export default () => {
       feedback: document.querySelector('.feedback'),
       feedsBox: document.querySelector('.feeds'),
       postsBox: document.querySelector('.posts'),
+      modal: document.querySelector('#modal'),
     };
 
     const watchedState = initView(state, elements, i18n);
