@@ -22,6 +22,9 @@ export default () => {
         error: null,
         valid: true,
       },
+      ui: {
+        seenPosts: new Set(),
+      },
     };
 
     const elements = {
