@@ -127,6 +127,12 @@ export default (watchedState, elements) => {
         };
         return;
       }
+
+      watchedState.loadingProcess = {
+        status: 'idle',
+        error: null,
+      };
+
       const feed = {
         id: uniqueId(),
         url,
@@ -151,11 +157,6 @@ export default (watchedState, elements) => {
         ...posts,
         ...watchedState.posts,
       ];
-
-      watchedState.loadingProcess = {
-        status: 'idle',
-        error: null,
-      };
     })
       .catch((err) => {
         watchedState.loadingProcess = {
