@@ -67,7 +67,7 @@ export default (state, elements, i18n) => {
     feedsBox.append(container);
   };
 
-  const renderPosts = (posts, postsBox) => {
+  const renderPosts = (posts, seenPosts, postsBox) => {
     const container = document.createDocumentFragment();
 
     const h2 = document.createElement('h2');
@@ -80,12 +80,19 @@ export default (state, elements, i18n) => {
       li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
       const a = document.createElement('a');
       a.setAttribute('href', post.link);
-      a.classList.add('font-weight-bold');
+      const fontWeight = seenPosts.has(post.id) ? 'font-weight-normal' : 'font-weight-bold';
+      a.classList.add(fontWeight);
       a.dataset.id = post.id;
       a.textContent = post.title;
       a.setAttribute('target', '_blank');
       a.setAttribute('rel', 'noopener noreferrer');
-      li.append(a);
+      const button = document.createElement('button');
+      button.setAttribute('type', 'button');
+      button.classList.add('btn', 'btn-primary', 'btn-sm');
+      button.dataset.id = post.id;
+      button.dataset.toggle = '#modal';
+      button.textContent = i18n.t('ui.preview');
+      li.append(a, button);
       return li;
     });
     ul.append(...items);
@@ -100,7 +107,7 @@ export default (state, elements, i18n) => {
     form: () => renderForm(state.form, elements),
     loadingProcess: () => renderLoadingProcess(state.loadingProcess, elements),
     feeds: () => renderFeeds(state.feeds, elements.feedsBox),
-    posts: () => renderPosts(state.posts, elements.postsBox),
+    posts: () => renderPosts(state.posts, state.ui.seenPosts, elements.postsBox),
   };
 
   const watchedState = onChange(state, (path) => {
