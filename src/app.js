@@ -166,5 +166,13 @@ export default (watchedState, elements) => {
       });
   });
 
+  elements.postsBox.addEventListener('click', (e) => {
+    if (e.target.dataset.id) {
+      const { id } = e.target.dataset;
+      watchedState.modal.postId = String(id);
+      watchedState.ui.seenPosts.add(id);
+    }
+  });
+
   postsUpdater(watchedState);
 };
