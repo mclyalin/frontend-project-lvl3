@@ -90,7 +90,8 @@ export default (state, elements, i18n) => {
       button.setAttribute('type', 'button');
       button.classList.add('btn', 'btn-primary', 'btn-sm');
       button.dataset.id = post.id;
-      button.dataset.toggle = '#modal';
+      button.dataset.toggle = 'modal';
+      button.dataset.target = '#modal';
       button.textContent = i18n.t('ui.preview');
       li.append(a, button);
       return li;
@@ -103,11 +104,23 @@ export default (state, elements, i18n) => {
     postsBox.append(container);
   };
 
+  const renderModal = (posts, postId, modal) => {
+    const post = posts.find(({ id }) => id === postId);
+    const title = modal.querySelector('.modal-title');
+    const body = modal.querySelector('.modal-body');
+    const link = modal.querySelector('.full-article');
+
+    title.textContent = post.title;
+    body.textContent = post.description;
+    link.href = post.link;
+  };
+
   const mapping = {
     form: () => renderForm(state.form, elements),
     loadingProcess: () => renderLoadingProcess(state.loadingProcess, elements),
     feeds: () => renderFeeds(state.feeds, elements.feedsBox),
     posts: () => renderPosts(state.posts, state.ui.seenPosts, elements.postsBox),
+    'modal.postId': () => renderModal(state.posts, state.modal.postId, elements.modal),
   };
 
   const watchedState = onChange(state, (path) => {

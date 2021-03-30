@@ -1,3 +1,5 @@
+import 'bootstrap/js/dist/modal';
+
 import i18n from 'i18next';
 import resources from './locales';
 import initView from './view.js';

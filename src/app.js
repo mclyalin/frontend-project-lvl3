@@ -167,6 +167,7 @@ export default (watchedState, elements) => {
   });
 
   elements.postsBox.addEventListener('click', (e) => {
+    console.log(e.target);
     if (e.target.dataset.id) {
       const { id } = e.target.dataset;
       watchedState.modal.postId = String(id);
