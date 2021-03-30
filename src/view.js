@@ -121,6 +121,7 @@ export default (state, elements, i18n) => {
     feeds: () => renderFeeds(state.feeds, elements.feedsBox),
     posts: () => renderPosts(state.posts, state.ui.seenPosts, elements.postsBox),
     'modal.postId': () => renderModal(state.posts, state.modal.postId, elements.modal),
+    'ui.seenPosts': () => renderPosts(state.posts, state.ui.seenPosts, elements.postsBox),
   };
 
   const watchedState = onChange(state, (path) => {
