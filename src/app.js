@@ -117,53 +117,54 @@ export default (watchedState, elements) => {
       error: null,
     };
 
-    const promise = axios.get(buildUrlString(url));
-    promise.then((response) => {
-      const data = parse(response.data.contents);
-      if (!data) {
-        watchedState.loadingProcess = {
-          status: 'failed',
-          error: 'noRss',
+    axios.get(buildUrlString(url))
+      .then((response) => {
+        const data = parse(response.data.contents);
+        if (!data) {
+          watchedState.loadingProcess = {
+            status: 'failed',
+            error: 'noRss',
+          };
+          return;
+        }
+
+        const feed = {
+          id: uniqueId(),
+          url,
+          title: data.title,
+          description: data.description,
         };
-        return;
-      }
 
-      watchedState.loadingProcess = {
-        status: 'idle',
-        error: null,
-      };
+        const posts = data.items.map((item) => ({
+          id: uniqueId(),
+          channelId: feed.id,
+          title: item.title,
+          description: item.description,
+          link: item.link,
+        }));
 
-      const feed = {
-        id: uniqueId(),
-        url,
-        title: data.title,
-        description: data.description,
-      };
+        watchedState.feeds = [
+          feed,
+          ...watchedState.feeds,
+        ];
 
-      const posts = data.items.map((item) => ({
-        id: uniqueId(),
-        channelId: feed.id,
-        title: item.title,
-        description: item.description,
-        link: item.link,
-      }));
-
-      watchedState.feeds = [
-        feed,
-        ...watchedState.feeds,
-      ];
-
-      watchedState.posts = [
-        ...posts,
-        ...watchedState.posts,
-      ];
-    })
-      .catch((err) => {
+        watchedState.posts = [
+          ...posts,
+          ...watchedState.posts,
+        ];
+      })
+      .then(() => {
+        watchedState.loadingProcess = {
+          status: 'idle',
+          error: null,
+        };
+      })
+      .catch(() => {
         watchedState.loadingProcess = {
           status: 'failed',
           error: 'network',
         };
-        throw err;
+        // throw err;
       })
       .finally(() => {
         setTimeout(() => postsUpdater(watchedState), timeout);
