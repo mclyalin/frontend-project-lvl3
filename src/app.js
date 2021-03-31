@@ -4,6 +4,8 @@ import axios from 'axios';
 import * as yup from 'yup';
 import { uniqueId, differenceBy } from 'lodash';
 
+const timeout = 5000;
+
 const validate = (value, list = []) => {
   yup.setLocale({
     string: {
@@ -58,8 +60,6 @@ const parse = (str) => {
 };
 
 const postsUpdater = (watchedState) => {
-  const timeout = 5000;
-
   const promises = watchedState.feeds.map(({ id, url }) => {
     const promise = axios
       .get(buildUrlString(url))
@@ -164,6 +164,9 @@ export default (watchedState, elements) => {
           error: 'network',
         };
         throw err;
+      })
+      .finally(() => {
+        setTimeout(() => postsUpdater(watchedState), timeout);
       });
   });
 
@@ -174,6 +177,4 @@ export default (watchedState, elements) => {
       watchedState.ui.seenPosts.add(id);
     }
   });
-
-  postsUpdater(watchedState);
 };
