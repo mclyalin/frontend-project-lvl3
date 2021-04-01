@@ -63,8 +63,8 @@ const postsUpdater = (watchedState) => {
   const promises = watchedState.feeds.map(({ id, url }) => {
     const promise = axios
       .get(buildUrlString(url))
-      .then((response) => {
-        const { items: current } = parse(response.data.contents);
+      .then((response) => parse(response.data.contents))
+      .then(({ items: current }) => {
         const existing = watchedState.posts.filter(({ channelId }) => channelId === id);
         const newPosts = differenceBy(current, existing, 'title')
           .map(({ title, description, link }) => (
@@ -86,6 +86,7 @@ const postsUpdater = (watchedState) => {
   });
 
   Promise.all(promises).finally(() => {
+    // console.log('tick');
     setTimeout(() => postsUpdater(watchedState), timeout);
   });
 };
@@ -118,8 +119,8 @@ export default (watchedState, elements) => {
     };
 
     axios.get(buildUrlString(url))
-      .then((response) => {
-        const data = parse(response.data.contents);
+      .then((response) => parse(response.data.contents))
+      .then((data) => {
         if (!data) {
           watchedState.loadingProcess = {
             status: 'failed',
@@ -152,8 +153,7 @@ export default (watchedState, elements) => {
           ...posts,
           ...watchedState.posts,
         ];
-      })
-      .then(() => {
+
         watchedState.loadingProcess = {
           status: 'idle',
           error: null,
@@ -167,7 +167,11 @@ export default (watchedState, elements) => {
         // throw err;
       })
       .finally(() => {
-        setTimeout(() => postsUpdater(watchedState), timeout);
+        const hasFeeds = watchedState.feeds.length > 0;
+        if (hasFeeds && watchedState.updateProcess.status === 'idle') {
+          watchedState.updateProcess = { status: 'started' };
+          setTimeout(() => postsUpdater(watchedState), timeout);
+        }
       });
   });
 

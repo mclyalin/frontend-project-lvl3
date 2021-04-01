@@ -31,6 +31,9 @@ export default () => {
       ui: {
         seenPosts: new Set(),
       },
+      updateProcess: {
+        status: 'idle',
+      },
     };
 
     const elements = {
